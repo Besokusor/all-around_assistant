@@ -1,23 +1,25 @@
 import os
+from urllib import response
+
 from openai import OpenAI
 from dotenv import load_dotenv
+
+from dotenv import load_dotenv
+from langchain.chat_models import init_chat_model
+from langchain.agents import create_agent
+from typing import Annotated, TypedDict
+from langgraph.graph import StateGraph, END
+from langchain_openai import ChatOpenAI
+from langchain_core.tools import tool
+from langchain_core.messages import HumanMessage, ToolMessage
 
 
 load_dotenv()
 
-client = OpenAI(
-    api_key=os.environ.get('DEEPSEEK_API_KEY'),
-    base_url="https://api.deepseek.com")
+model = init_chat_model(model="deepseek-v4-flash",temperature=0)
+agent = create_agent(model)
 
-response = client.chat.completions.create(
-    model="deepseek-v4-pro",
-    messages=[
-        {"role": "system", "content": "You are a helpful assistant"},
-        {"role": "user", "content": "Hello"},
-    ],
-    stream=False,
-    # reasoning_effort="high",
-    extra_body={"thinking": {"type": "disabled"}}
-)
+response = agent.invoke({
+    "messages":[{"role":"user","content":"你是谁"}]
+})
 print(response)
-print(response.choices[0].message.content)
